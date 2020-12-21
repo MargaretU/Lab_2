@@ -1,0 +1,87 @@
+LIVING_CELL = '*'
+DEAD_CELL = '_'
+
+#Отримання живих клітини від користувача
+def getBoard(rows, cols):
+    myList = [[0]*cols for i in range(rows)]
+    while True:
+        raw = input('Будь ласка вкажіть рядок та стовпчик через пробіл, або нажмвть пробіл щоб закінчити: ')
+        if raw == '':
+            break
+        splitted = raw.split()
+        if len(splitted) != 2:
+            print("Неправильне введення")
+        else:
+            row, col = int(splitted[0]), int(splitted[1])
+            if row >= rows or col >= cols:
+                print("Неправильне значення рядка чи стовпця")
+            else:
+                myList[row][col] = 1
+                printBoard(rows, cols, myList)
+    return myList
+
+#наступні комірки дошки
+def getNxtIter(rows, cols, cur, nxt):
+    for i in range(rows):
+        for j in range(cols):
+            nxt[i][j] = getNeighbors(rows, cols, i, j, cur)
+
+#Обробка сусідніх комірок
+def getNeighbors(rows, cols, x, y, boardList):
+    nCount = 0
+    for j in range(y-1,y+2):
+        for i in range(x-1,x+2):
+            if not(i == x and j == y):
+                itest, jtest = i, j
+                if itest == rows:
+                    itest = 0
+                if jtest == cols:
+                    jtest = 0
+                nCount += boardList[itest][jtest]
+    if nCount == 3 or (boardList[x][y] == 1 and nCount == 2):
+        return 1
+    return 0
+
+#Друк та формування фактичної дошки
+def printBoard(rows, cols, boardList):
+    for i in range(rows):
+        line = []
+        for j in range(cols):
+            if boardList[i][j] == 1:
+                line.append(LIVING_CELL)
+            else:
+                line.append(DEAD_CELL)
+        print("".join(line))
+
+def main():
+    #Отримання та перевірка кількості рядків та стовпців
+    while True:
+        rows = int(input("Вкажіть кількість рядків: "))
+        if rows > 0 and rows <= 50:
+            break
+
+    while True:
+        cols = int(input("Вкажіть кількість стовпців: "))
+        if rows > 0 and rows <= 50:
+            break
+
+    boardList = getBoard(rows, cols)
+    newBoardList = [x[:] for x in boardList]
+
+    print()
+
+    #Отримання ітерацій для запуску та перевірка, якщо <= 0
+    while True:
+        iterations = int(input("Скільки ітерацій запустити? "))+1
+        if iterations > 0:
+            break
+
+    for count in range(iterations):
+        print()
+        print("Iteration:", count)
+        print()
+        printBoard(rows, cols, boardList)
+        getNxtIter(rows, cols, boardList, newBoardList)
+        boardList, newBoardList = newBoardList, boardList
+
+main()
